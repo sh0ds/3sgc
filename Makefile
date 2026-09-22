@@ -3,7 +3,7 @@ CFLAGS  = -std=c11 -Wall -Wextra -g -fsanitize=address,undefined
 SRC     = $(wildcard src/*.c)
 OBJ     = $(SRC:src/%.c=build/%.o)
 
-build/ssg: $(OBJ)
+build/statiq: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
 build/%.o: src/%.c | build
