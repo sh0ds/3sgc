@@ -4,9 +4,10 @@
 #include <dirent.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 int copy_file(const char *src, const char *dst);
-int print_folder(const char *folder);
+int copy_dir(const char *src, const char *dst);
 int join_path(char *out, size_t out_size, const char *dir, const char *name);
 
 
@@ -19,7 +20,7 @@ int main (int argc, char *argv[]) {
         }*/
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-    print_folder(".");
+    copy_dir("./tests/site1/static", "./tests/site1/public");
 
     /*
     char str[50];
@@ -86,24 +87,33 @@ int join_path(char *out, size_t out_size, const char *dir, const char *name) {
 }
 
 // open folder and print it's contents
-int print_folder(const char* folder){
+int copy_dir(const char *src, const char *dst){
 
-    DIR *dir;
+    DIR *sd, *dd;
 	struct dirent *entry;
 	struct stat st;
 
-	// open folder
-	dir = opendir(folder);
-	if (dir == NULL) {
+	mkdir(dst, 0777);
+
+	// open src
+	sd = opendir(src);
+	if (sd == NULL) {
+	    perror("Cannot open folder");
+					return -1;
+	}
+
+	// open dst
+	dd = opendir(dst);
+	if (dd == NULL) {
 		perror("Cannot open folder");
 		return -1;
 	}
 
 	// print every entry
-	while ((entry = readdir(dir)) != NULL) {
+	while ((entry = readdir(sd)) != NULL) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {continue;}
 		char path[PATH_MAX];
-		if (join_path(path, sizeof(path), folder, entry->d_name) == -1) {
+		if (join_path(path, sizeof(path), src, entry->d_name) == -1) {
 		    fprintf(stderr, "Joining path failed\n");
 		    continue;
 		}
@@ -118,7 +128,8 @@ int print_folder(const char* folder){
 		}
 	}
 
-	closedir(dir);
+	closedir(sd);
+	closedir(dd);
 
 	return 0;
 }
