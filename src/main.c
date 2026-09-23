@@ -70,7 +70,7 @@ int main (int argc, char *argv[]) {
         }*/
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-	print_fs("./tests/site1/static");
+	print_folder("./tests/site1/static");
 
     return 0;
 }
