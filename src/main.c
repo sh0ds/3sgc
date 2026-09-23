@@ -1,13 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 
 int copy_file(const char *src, const char *dst) {
-    FILE *f_src = fopen(src, "rb");
+    FILE *f_src, *f_dst;
+	
+	f_src = fopen(src, "rb");
 	if (f_src == NULL) {
 		perror("Error opening source file");
 		return -1;
 	}
-    FILE *f_dst = fopen(dst, "wb");
+
+    f_dst = fopen(dst, "wb");
 	if (f_dst == NULL) {
 		perror("Error opening destination file");
 		fclose(f_src);
@@ -36,15 +40,37 @@ int copy_file(const char *src, const char *dst) {
 	return 0;
 }
 
+
+int print_folder(const char* folder){ 
+	DIR *dir;
+	struct dirent *entry;
+
+	dir = opendir(folder);
+	if (dir == NULL) {
+		perror("Cannot open folder");
+		return -1;
+	}
+
+	entry = readdir(dir);
+	while (entry != NULL) {
+		printf("%s\n", entry->d_name);
+	}
+
+	closedir(dir);
+
+	return 0;
+}
+
 int main (int argc, char *argv[]) {
     /*if (argc > 1) {
         printf("Building %s\n", argv[1]);
     } else {
-        printf("usage: statiq path_to_site_folder\n");
+        printf("usage: 3sgc path_to_site_folder\n");
         exit(1);
         }*/
 
-    copy_file("./tests/site1/static/style.css", "./tmp/style.css");
+    // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
+	print_fs("./tests/site1/static");
 
     return 0;
 }
