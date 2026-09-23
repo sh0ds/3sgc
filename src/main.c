@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
+#include <sys/stat.h>
 
 int copy_file(const char *src, const char *dst);
-int print_folder(const char* folder);
+int print_folder(const char *folder);
+int join_path(char *out, size_t out_size, const char *dir, const char *name);
 
 
 int main (int argc, char *argv[]) {
@@ -16,7 +18,13 @@ int main (int argc, char *argv[]) {
         }*/
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-	print_folder("./tests");
+    // print_folder("./tests");
+
+    /*
+    char str[50];
+    join_path(str, 50, "test", "test.css");
+	printf("%s\n", str);
+	*/
 
     return 0;
 }
@@ -25,7 +33,7 @@ int main (int argc, char *argv[]) {
 // copies src to dst, in buffer sizes of 4KB
 int copy_file(const char *src, const char *dst) {
     FILE *f_src, *f_dst;
-	
+
 	// open source file
 	f_src = fopen(src, "rb");
 	if (f_src == NULL) {
@@ -44,7 +52,7 @@ int copy_file(const char *src, const char *dst) {
 	// while fread returns > 0, write to destination
     char buf[4096];
     size_t rf;
-	while ((rf = fread(buf, 1, sizeof buf, f_src)) > 0) {	
+	while ((rf = fread(buf, 1, sizeof buf, f_src)) > 0) {
 		if (fwrite(buf, sizeof(char), rf, f_dst) < rf) {
 			perror("Write failed");
 			fclose(f_src);
@@ -52,7 +60,7 @@ int copy_file(const char *src, const char *dst) {
 			return -1;
 		}
     }
-	
+
 	if (ferror(f_src) != 0) {
 		perror("Error reading source file");
 		fclose(f_src);
@@ -62,14 +70,26 @@ int copy_file(const char *src, const char *dst) {
 
 	fclose(f_src);
 	fclose(f_dst);
-	
+
 	return 0;
 }
 
+int join_path(char *out, size_t out_size, const char *dir, const char *name) {
+
+    int res = snprintf(out, out_size, "%s/%s", dir, name);
+
+    if (res < 0 || (size_t)res >= out_size) {
+        return -1;
+    }
+
+    return 0;
+}
+
 // open folder and print it's contents
-int print_folder(const char* folder){ 
+int print_folder(const char* folder){
 	DIR *dir;
 	struct dirent *entry;
+	struct stat st;
 
 	// open folder
 	dir = opendir(folder);
