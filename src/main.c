@@ -20,7 +20,7 @@ int main (int argc, char *argv[]) {
         }*/
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-    copy_dir("./tests/site1/static", "./tests/site1/public");
+    copy_dir("./tests", "./tmp");
 
     /*
     char str[50];
@@ -112,19 +112,27 @@ int copy_dir(const char *src, const char *dst){
 	// print every entry
 	while ((entry = readdir(sd)) != NULL) {
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {continue;}
-		char path[PATH_MAX];
-		if (join_path(path, sizeof(path), src, entry->d_name) == -1) {
+		char src_path[PATH_MAX];
+		char dst_path[PATH_MAX];
+		if (join_path(src_path, sizeof(src_path), src, entry->d_name) == -1 ||
+		    join_path(dst_path, sizeof(dst_path), dst, entry->d_name) == -1) {
 		    fprintf(stderr, "Joining path failed\n");
-		    continue;
+		    return -1;
 		}
-		if (stat(path, &st) != 0) {
-		    perror(path);
-		    continue;
+		if (stat(src_path, &st) != 0) {
+		    perror(src_path);
+		    return -1;
 		}
 		if (S_ISDIR(st.st_mode)) {
-		    printf("%s - dir\n", path);
+		    if(copy_dir(src_path, dst_path) != 0) {
+				closedir(sd);
+				return -1;
+			}
 		} else {
-		    printf("%s - file\n", path);
+		    if(copy_file(src_path, dst_path) != 0) {
+				closedir(sd);
+				return -1;
+			}
 		}
 	}
 
