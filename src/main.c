@@ -1,3 +1,4 @@
+#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -18,7 +19,7 @@ int main (int argc, char *argv[]) {
         }*/
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-    // print_folder("./tests");
+    print_folder("./tests");
 
     /*
     char str[50];
@@ -100,8 +101,20 @@ int print_folder(const char* folder){
 
 	// print every entry
 	while ((entry = readdir(dir)) != NULL) {
-		if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-			printf("%s\n", entry->d_name);
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {continue;}
+		char path[PATH_MAX];
+		if (join_path(path, sizeof(path), folder, entry->d_name) == -1) {
+		    fprintf(stderr, "Joining path failed\n");
+		    continue;
+		}
+		if (stat(path, &st) != 0) {
+		    perror(path);
+		    continue;
+		}
+		if (S_ISDIR(st.st_mode)) {
+		    printf("%s - dir\n", path);
+		} else {
+		    printf("%s - file\n", path);
 		}
 	}
 
