@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <linux/limits.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -46,7 +47,11 @@ int copy_file(const char *src, const char *dst) {
 	}
 
 	fclose(f_src);
-	fclose(f_dst);
+	
+	if (fclose(f_dst) != 0) {
+		perror(dst);
+		return -1;
+	}
 
 	return 0;
 }
@@ -60,13 +65,17 @@ int join_path(char *out, size_t out_size, const char *dir, const char *name) {
 	return 0;
 }
 
-// open folder and print it's contents
+// recursively copies directory src to dst
 int copy_dir(const char *src, const char *dst) {
 	DIR *sd;
 	struct dirent *entry;
 	struct stat st;
 
-	mkdir(dst, 0777);
+	// create dst, it's fine if it already exists
+	if (mkdir(dst, 0777) != 0 && errno != EEXIST) {
+		perror(dst);
+		return -1;
+	}
 
 	// open src
 	sd = opendir(src);
@@ -94,7 +103,7 @@ int copy_dir(const char *src, const char *dst) {
 		}
 
 		// get type of src
-		if (stat(src_path, &st) != 0) {
+		if (lstat(src_path, &st) != 0) {
 			perror(src_path);
 			closedir(sd);
 			return -1;
@@ -106,12 +115,15 @@ int copy_dir(const char *src, const char *dst) {
 				closedir(sd);
 				return -1;
 			}
-		} else {
-			// else copy the file
+		} else if (S_ISREG(st.st_mode)) {
+			// copy regular files
 			if (copy_file(src_path, dst_path) != 0) {
 				closedir(sd);
 				return -1;
 			}
+		} else {
+			// skip symlinks, FIFOs, devices, sockets
+			fprintf(stderr, "Skipping %s (not a regular file)\n", src_path);
 		}
 	}
 
