@@ -109,9 +109,13 @@ int copy_dir(const char *src, const char *dst){
 		return -1;
 	}
 
-	// print every entry
+	// copy every entry
 	while ((entry = readdir(sd)) != NULL) {
+
+	    // skip current and parent directory
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {continue;}
+
+		// create path of src and dst via helper function
 		char src_path[PATH_MAX];
 		char dst_path[PATH_MAX];
 		if (join_path(src_path, sizeof(src_path), src, entry->d_name) == -1 ||
@@ -119,16 +123,18 @@ int copy_dir(const char *src, const char *dst){
 		    fprintf(stderr, "Joining path failed\n");
 		    return -1;
 		}
+
+		// get type of src
 		if (stat(src_path, &st) != 0) {
 		    perror(src_path);
 		    return -1;
 		}
-		if (S_ISDIR(st.st_mode)) {
+		if (S_ISDIR(st.st_mode)) {      // call copy_dir recursively if directory
 		    if(copy_dir(src_path, dst_path) != 0) {
 				closedir(sd);
 				return -1;
 			}
-		} else {
+		} else {                        // else copy the file
 		    if(copy_file(src_path, dst_path) != 0) {
 				closedir(sd);
 				return -1;
