@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <string.h>
 
 int copy_file(const char *src, const char *dst);
 int print_folder(const char* folder);
@@ -15,7 +16,7 @@ int main (int argc, char *argv[]) {
         }*/
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-	print_folder("./tests/site1/static");
+	print_folder("./tests");
 
     return 0;
 }
@@ -79,7 +80,9 @@ int print_folder(const char* folder){
 
 	// print every entry
 	while ((entry = readdir(dir)) != NULL) {
-		printf("%s\n", entry->d_name);
+		if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+			printf("%s\n", entry->d_name);
+		}
 	}
 
 	closedir(dir);
