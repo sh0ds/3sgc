@@ -64,7 +64,7 @@ int join_path(char *out, size_t out_size, const char *dir, const char *name) {
 // open folder and print it's contents
 int copy_dir(const char *src, const char *dst){
 
-    DIR *sd, *dd;
+    DIR *sd;
 	struct dirent *entry;
 	struct stat st;
 
@@ -89,12 +89,14 @@ int copy_dir(const char *src, const char *dst){
 		if (join_path(src_path, sizeof(src_path), src, entry->d_name) == -1 ||
 		    join_path(dst_path, sizeof(dst_path), dst, entry->d_name) == -1) {
 		    fprintf(stderr, "Joining path failed\n");
+      closedir(sd);
 		    return -1;
 		}
 
 		// get type of src
 		if (stat(src_path, &st) != 0) {
 		    perror(src_path);
+      closedir(sd);
 		    return -1;
 		}
 		if (S_ISDIR(st.st_mode)) {      // call copy_dir recursively if directory
@@ -111,7 +113,6 @@ int copy_dir(const char *src, const char *dst){
 	}
 
 	closedir(sd);
-	closedir(dd);
 
 	return 0;
 }
