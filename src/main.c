@@ -19,7 +19,7 @@ int main (int argc, char *argv[]) {
         }*/
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-    print_folder("./tests");
+    print_folder(".");
 
     /*
     char str[50];
@@ -78,7 +78,6 @@ int copy_file(const char *src, const char *dst) {
 int join_path(char *out, size_t out_size, const char *dir, const char *name) {
 
     int res = snprintf(out, out_size, "%s/%s", dir, name);
-
     if (res < 0 || (size_t)res >= out_size) {
         return -1;
     }
@@ -88,7 +87,8 @@ int join_path(char *out, size_t out_size, const char *dir, const char *name) {
 
 // open folder and print it's contents
 int print_folder(const char* folder){
-	DIR *dir;
+
+    DIR *dir;
 	struct dirent *entry;
 	struct stat st;
 
