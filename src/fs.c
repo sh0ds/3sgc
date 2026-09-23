@@ -77,13 +77,6 @@ int copy_dir(const char *src, const char *dst){
 					return -1;
 	}
 
-	// open dst
-	dd = opendir(dst);
-	if (dd == NULL) {
-		perror("Cannot open folder");
-		return -1;
-	}
-
 	// copy every entry
 	while ((entry = readdir(sd)) != NULL) {
 
