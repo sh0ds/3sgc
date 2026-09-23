@@ -2,6 +2,25 @@
 #include <stdlib.h>
 #include <dirent.h>
 
+int copy_file(const char *src, const char *dst);
+int print_folder(const char* folder);
+
+
+int main (int argc, char *argv[]) {
+    /*if (argc > 1) {
+        printf("Building %s\n", argv[1]);
+    } else {
+        printf("usage: 3sgc path_to_site_folder\n");
+        exit(1);
+        }*/
+
+    // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
+	print_folder("./tests/site1/static");
+
+    return 0;
+}
+
+
 // copies src to dst, in buffer sizes of 4KB
 int copy_file(const char *src, const char *dst) {
     FILE *f_src, *f_dst;
@@ -46,7 +65,7 @@ int copy_file(const char *src, const char *dst) {
 	return 0;
 }
 
-// open folder and print everything in it
+// open folder and print it's contents
 int print_folder(const char* folder){ 
 	DIR *dir;
 	struct dirent *entry;
@@ -66,18 +85,4 @@ int print_folder(const char* folder){
 	closedir(dir);
 
 	return 0;
-}
-
-int main (int argc, char *argv[]) {
-    /*if (argc > 1) {
-        printf("Building %s\n", argv[1]);
-    } else {
-        printf("usage: 3sgc path_to_site_folder\n");
-        exit(1);
-        }*/
-
-    // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-	print_folder("./tests/site1/static");
-
-    return 0;
 }
