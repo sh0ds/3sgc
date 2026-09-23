@@ -1,16 +1,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void copy_file(const char *src, const char *dst) {
+int copy_file(const char *src, const char *dst) {
     FILE *f_src = fopen(src, "rb");
+	if (f_src == NULL) {
+		perror("Error opening source file");
+		return -1;
+	}
     FILE *f_dst = fopen(dst, "wb");
-    char str[100];
-    while (fgets(str, 100, f_src)) {
-        printf("%s", str);
+	if (f_dst == NULL) {
+		perror("Error opening destination file");
+		fclose(f_src);
+		return -1;
+	}
+    char buf[4096];
+    size_t rf;
+	while ((rf = fread(buf, 1, sizeof buf, f_src)) > 0) {	
+		if (fwrite(buf, sizeof(char), rf, f_dst) < rf) {
+			perror("Write failed");
+			fclose(f_src);
+			fclose(f_dst);
+			return -1;
+		}
     }
+	
+	if (ferror(f_src) != 0) {
+		perror("Error reading source file");
+		fclose(f_src);
+		fclose(f_dst);
+		return -1;
+	}
+	fclose(f_src);
+	fclose(f_dst);
+	
+	return 0;
 }
 
-int main (/*int argc, char *argv[]*/) {
+int main (int argc, char *argv[]) {
     /*if (argc > 1) {
         printf("Building %s\n", argv[1]);
     } else {
