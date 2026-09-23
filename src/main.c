@@ -51,8 +51,7 @@ int print_folder(const char* folder){
 		return -1;
 	}
 
-	entry = readdir(dir);
-	while (entry != NULL) {
+	while ((entry = readdir(dir)) != NULL) {
 		printf("%s\n", entry->d_name);
 	}
 
