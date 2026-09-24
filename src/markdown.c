@@ -3,12 +3,15 @@
 #include <string.h>
 #include "markdown.h"
 
+// close paragraph helper
 static void close_paragraph(FILE* out, int *in_paragraph) {
     if (*in_paragraph) {
         fprintf(out, "</p>\n");
         *in_paragraph = 0;
     }
 }
+
+// TODO: add HTML escaping function
 
 int md_to_html(const char *md, const char *html) {
     // open files
