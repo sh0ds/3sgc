@@ -3,6 +3,6 @@
 #include <stdio.h>
 
 int md_to_html(const char *md, const char *html);
-static void close_paragraph(FILE* out, int *in_paragraph);
+static void close_p(FILE* out, int *in_p);
 
 #endif
