@@ -10,11 +10,11 @@ int main (int argc, char *argv[]) {
         exit(1);
         }*/
 
-    // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-    // copy_dir("./tests", "./tmp");
     FILE *md = fopen("tests/site1/content/index.md", "r");
-    FILE *html = fopen("tests/site1/templates/base.html", "w");
+    FILE *html = fopen("tests/site1/static/index.html", "w");
     md_to_html(md, html);
+
+    copy_dir("tests/site1/static", "tests/site1/public");
 
     /*
     char str[50];
