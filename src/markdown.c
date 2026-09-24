@@ -53,6 +53,26 @@ int md_to_html(FILE *md_file, FILE *html_file) {
             ln[--len] = '\0';
         }
 
+        // check for fence
+        if (strncmp(ln, "```", 3) == 0) {
+            if (!in_code) {
+                close_p(html_file, &in_p);
+                fprintf(html_file, "<pre><code>");
+                in_code = 1;
+            } else {
+                fprintf(html_file, "</code></pre>\n");
+                in_code = 0;
+            }
+            continue;
+        }
+
+        // check if in code
+        if (in_code) {
+            write_text(html_file, ln);
+            fputc('\n', html_file);
+            continue;
+        }
+
         // header check, convert number of '#' to <h*>
         while (ln[lvl] == '#') {
             lvl++;
@@ -67,18 +87,7 @@ int md_to_html(FILE *md_file, FILE *html_file) {
         } else if (len == 0) {
             close_p(html_file, &in_p);
 
-        // checking whether in code or not
-        } else if (strncmp(ln, "```", 3) == 0) {
-            if (!in_code) {
-                fprintf(html_file, "<code>");
-                in_code = 1;
-            } else {
-                fprintf(html_file, "</code>");
-                in_code = 0;
-            }
-            write_text(html_file, ln + 3);
-
-        // checking whether in code or not
+        // checking whether in <p> or not
         } else {
             if (!in_p) {
                 fprintf(html_file, "<p>");
@@ -89,6 +98,9 @@ int md_to_html(FILE *md_file, FILE *html_file) {
         }
     }
     close_p(html_file, &in_p);
+    if (in_code) {
+        fprintf(html_file, "</code></pre>\n");
+    }
 
     int result = (ferror(md_file) || ferror(html_file)) ? -1 : 0;
     free(ln);
