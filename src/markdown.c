@@ -3,6 +3,12 @@
 #include <string.h>
 #include "markdown.h"
 
+static void close_paragraph(FILE* out, int *in_paragraph) {
+    if (*in_paragraph) {
+        fprintf(out, "</p>\n");
+        *in_paragraph = 0;
+    }
+}
 
 int md_to_html(const char *md, const char *html) {
     
@@ -34,26 +40,20 @@ int md_to_html(const char *md, const char *html) {
             level++;
         }
         if (level > 0 && level < 7 && line[level] == ' ') {
-            if (in_paragraph) {
-                fprintf(html_file, "</p>\n");
-                in_paragraph = 0;
-            }
+            close_paragraph(html_file, &in_paragraph);
             fprintf(html_file, "<h%d>%s</h%d>\n", level, line + level + 1, level);
-    } else if (len == 0) {
-        if (in_paragraph) {
-            fprintf(html_file, "</p>\n");
-            in_paragraph = 0;
-        }
-        if (!in_paragraph) {
-            fprintf(html_file, "<p>");
-            in_paragraph = 1;
-        }
-        fprintf(html_file, "%s\n", line);
+        } else if (len == 0) {
+            close_paragraph(html_file, &in_paragraph);
+        } else {
+            if (!in_paragraph) {
+                fprintf(html_file, "<p>");
+                in_paragraph = 1;
+            }
+            fprintf(html_file, "%s\n", line);
         }
     }
-    if (in_paragraph) {
-        fprintf(html_file, "</p>\n");
-    }
+    close_paragraph(html_file, &in_paragraph);
+
     int result = ferror(md_file) ? -1 : 0;
     free(line);
     fclose(md_file);
