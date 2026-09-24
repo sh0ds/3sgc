@@ -28,7 +28,7 @@ int main (int argc, char *argv[]) {
         exit(1);
         }*/
 
-    char *md_path = "sites/site1/content/index.md";
+    char *md_path = "sites/site1/content/test.md";
     char *html_path = "sites/site1/static/index.html";
     const char *temp_path = "sites/site1/templates/basic.html";
 
