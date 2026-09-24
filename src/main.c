@@ -7,15 +7,16 @@
  * loop over content folder, converting every entry to html,
  * implement shell args to 1: build content folder; 2: copy static to public,
  * add more markdown syntax:
+ *      - links
+ *      - images
  *      - horizontal rules
  *      - bold and italic
  *      - lists (ordered, unordered)
+ *      - syntax highlighting
  *      - blockquotes
- *      - images
- *      - links, footnotes
+ *      - footnotes
  *      - highlight
  *      - subscript, superscript
- *      - syntax highlighting
  */
 
 int main (int argc, char *argv[]) {
