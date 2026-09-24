@@ -1,40 +1,32 @@
 <!doctype html>
 <html lang="en">
-    <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>#sh0ds-devblog</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
-    </head>
-    <body>
-        <header class="header">
-            <div class="brand">
-                <a href="/index.html">#sh0ds-devblog</a>
-            </div>
-            <nav class="nav">
-                <ul>
-                    <li><a href="/blog.html">Blog</a></li>
-                </ul>
-            </nav>
-        </header>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="/">sh0ds-devblog</a>
+        <nav aria-label="Main">
+            <ul>
+                <li><a href="/blog.html">Blog</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        <main>
-            <section class="base">
+    <main>
 {{ content }}
-            </section>
-        </main>
+    </main>
 
-        <footer class="site-footer">
-            <div class="footer-content">
-                <div class="footer-info">
-                    <p>© 2026 sh0ds. Hosted on RPi 5, built with 3sgc</p>
-                </div>
-                <div class="footer-links">
-                    <a href="https://github.com/sh0ds" target="_blank" rel="noopener">GitHub</a>
-                    <a href="https://sh0ds.itch.io/" target="_blank" rel="noopener">itch.io</a>
-                    <a href="mailto:mail@sh0ds.dev">Contact</a>
-                </div>
-            </div>
-        </footer>
-    </body>
+    <footer class="site-footer">
+        <p><small>© 2026 sh0ds. Hosted on RPi 5, built with 3sgc</small></p>
+        <ul class="footer-links">
+            <li><a href="https://github.com/sh0ds" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="https://sh0ds.itch.io/" target="_blank" rel="noopener">itch.io</a></li>
+            <li><a href="mailto:mail@sh0ds.dev">Contact</a></li>
+        </ul>
+    </footer>
+</body>
 </html>
