@@ -3,11 +3,10 @@
 #include <string.h>
 #include "markdown.h"
 
-// close paragraph helper
-static void close_paragraph(FILE* out, int *in_paragraph) {
-    if (*in_paragraph) {
+static void close_p(FILE* out, int *in_p) {
+    if (*in_p) {
         fprintf(out, "</p>\n");
-        *in_paragraph = 0;
+        *in_p = 0;
     }
 }
 
@@ -28,46 +27,49 @@ int md_to_html(const char *md, const char *html) {
     }
     
     //variables
-    char *line = NULL;
+    char *ln = NULL;
     size_t cap = 0;
     ssize_t len;
-    int in_paragraph = 0;
+    int in_p = 0;
 
     // getline loop
-    while ((len = getline(&line, &cap, md_file)) != -1) {
-        int level = 0;
+    while ((len = getline(&ln, &cap, md_file)) != -1) {
+        int lvl = 0;
         
-        if (len > 0 && line[len - 1] == '\n') {
-            line[--len] = '\0';
+        if (len > 0 && ln[len - 1] == '\n') {
+            ln[--len] = '\0';
         }
 
-        while (line[level] == '#') {
-            level++;
+        while (ln[lvl] == '#') {
+            lvl++;
         }
 
         // header check
-        if (level > 0 && level < 7 && line[level] == ' ') {
-            close_paragraph(html_file, &in_paragraph);
-            fprintf(html_file, "<h%d>%s</h%d>\n", level, line + level + 1, level);
+        if (lvl > 0 && lvl < 7 && ln[lvl] == ' ') {
+            close_p(html_file, &in_p);
+            fprintf(html_file, "<h%d>%s</h%d>\n", lvl, ln + lvl + 1, lvl);
         
         // empty line check    
         } else if (len == 0) {
-            close_paragraph(html_file, &in_paragraph);
+            close_p(html_file, &in_p);
 
         // if not in paragraph, open <p>, print
         } else {
-            if (!in_paragraph) {
+            if (!in_p) {
                 fprintf(html_file, "<p>");
-                in_paragraph = 1;
+                in_p = 1;
             }
-            fprintf(html_file, "%s\n", line);
+            fprintf(html_file, "%s\n", ln);
         }
     }
-    close_paragraph(html_file, &in_paragraph);
+    close_p(html_file, &in_p);
 
     int result = ferror(md_file) ? -1 : 0;
-    free(line);
+    free(ln);
     fclose(md_file);
-    fclose(html_file);
+    if(fclose(html_file) != 0) {
+        perror("Error closing HTML file");
+        return -1;
+    }
     return result;
 }
