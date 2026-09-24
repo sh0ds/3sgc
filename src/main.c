@@ -24,7 +24,7 @@ int main (int argc, char *argv[]) {
         printf("Building %s\n", argv[1]);
     } else {
         printf("usage: 3sgc path_to_site_folder -flag\n");
-        printf("flags: -s: convert to static, -p: push to public");
+        printf("flags: -s: convert to static, -p: push to public\n");
         exit(1);
         }*/
 
