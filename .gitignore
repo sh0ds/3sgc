@@ -1,7 +1,7 @@
 build/
-tests/*/public/*
-!tests/*/public/.gitkeep
+sites/*/public/*
+!sites/*/public/.gitkeep
 tmp/
-tests/*/static/*
-!tests/*/static/.gitkeep
-tests/*/templates/basic.html
+sites/*/static/*
+!sites/*/static/.gitkeep
+sites/*/templates/basic.html

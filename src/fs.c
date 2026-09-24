@@ -47,7 +47,7 @@ int copy_file(const char *src, const char *dst) {
 	}
 
 	fclose(f_src);
-	
+
 	if (fclose(f_dst) != 0) {
 		perror(dst);
 		return -1;
@@ -130,4 +130,30 @@ int copy_dir(const char *src, const char *dst) {
 	closedir(sd);
 
 	return 0;
+}
+
+// funtion for reading whole files
+char *read_file(const char *path) {
+    FILE *file = fopen(path, "rb");
+    if (file == NULL) return NULL;
+
+    char    *buffer;
+    long    numbytes;
+
+    // allocate enough space for buffer
+    fseek(file, 0L, SEEK_END);
+    numbytes = ftell(file);
+    fseek(file, 0L, SEEK_SET);
+    buffer = malloc(numbytes + 1);
+    if(buffer == NULL) {
+        fclose(file);
+        return NULL;
+    }
+
+    // copy all the text into the buffer
+    fread(buffer, sizeof(char), numbytes, file);
+    buffer[numbytes] = '\0';
+    fclose(file);
+
+    return buffer;
 }

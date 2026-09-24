@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "fs.h"
 #include "markdown.h"
 
@@ -9,12 +10,13 @@ int main (int argc, char *argv[]) {
         printf("usage: 3sgc path_to_site_folder\n");
         exit(1);
         }*/
+    char *md_path = "sites/site1/content/index.md";
+    char *html_path = "sites/site1/static/index.html";
+    const char *temp_path = "sites/site1/templates/basic.html";
 
-    FILE *md = fopen("tests/site1/content/index.md", "r");
-    FILE *html = fopen("tests/site1/static/index.html", "w");
-    md_to_html(md, html);
+    render_page(temp_path, md_path, html_path);
 
-    copy_dir("tests/site1/static", "tests/site1/public");
+    // copy_dir("tests/site1/static", "tests/site1/public");
 
     /*
     char str[50];
