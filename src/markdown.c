@@ -39,23 +39,15 @@ int md_to_html(const char *md, const char *html) {
                 in_paragraph = 0;
             }
             fprintf(html_file, "<h%d>%s</h%d>\n", level, line + level + 1, level);
-    
-    // 1. if a paragraph is open: print "</p>\n", clear the flag
-    // 2. print the heading
     } else if (len == 0) {
         if (in_paragraph) {
             fprintf(html_file, "</p>\n");
             in_paragraph = 0;
         }
-
-    // if a paragraph is open: print "</p>\n", clear the flag
-    } else {
         if (!in_paragraph) {
             fprintf(html_file, "<p>");
             in_paragraph = 1;
         }
-    // 1. if no paragraph is open: print "<p>", set the flag
-    // 2. print the line (always, not in an else)
         fprintf(html_file, "%s\n", line);
         }
     }
