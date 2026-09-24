@@ -40,7 +40,7 @@ int md_to_html(FILE *md_file, FILE *html_file) {
     char *ln = NULL;
     size_t cap = 0;
     ssize_t len;
-    int in_p = 0;
+    int in_p = 0, in_code = 0;
 
     // getline loop
     while ((len = getline(&ln, &cap, md_file)) != -1) {
@@ -68,6 +68,15 @@ int md_to_html(FILE *md_file, FILE *html_file) {
             close_p(html_file, &in_p);
 
         // checking whether in <p> or not 
+        } else if (strncmp(ln, "```", 3) == 0) {
+            if (!in_code) {
+                fprintf(html_file, "<code>");
+                in_code = 1;
+            } else {
+                fprintf(html_file, "</code>");
+                in_code = 0;
+            }
+            write_text(html_file, ln);
         } else {
             if (!in_p) {
                 fprintf(html_file, "<p>");
