@@ -11,6 +11,7 @@ static void close_p(FILE *out, int *in_p) {
   }
 }
 
+// HTML escaping
 static void write_text(FILE *out, const char *s) {
   size_t len = strlen(s);
 
@@ -53,6 +54,10 @@ int md_convert(FILE *md_file, FILE *html_file) {
       ln[--len] = '\0';
     }
 
+    /*
+     *     -- CODE BLOCKS --
+     */
+
     // check for fence
     if (strncmp(ln, "```", 3) == 0) {
       if (!in_code) {
@@ -73,6 +78,10 @@ int md_convert(FILE *md_file, FILE *html_file) {
       continue;
     }
 
+    /*
+     *      -- HEADERS --
+     */
+
     // header check, convert number of '#' to <h*>
     while (ln[lvl] == '#') {
       lvl++;
@@ -82,6 +91,10 @@ int md_convert(FILE *md_file, FILE *html_file) {
       fprintf(html_file, "<h%d>", lvl);
       write_text(html_file, ln + lvl + 1);
       fprintf(html_file, "</h%d>\n", lvl);
+
+   /*
+    *       -- EMPTY LINES & PARAPGRAPHS --
+    */
 
       // empty line check
     } else if (len == 0) {
