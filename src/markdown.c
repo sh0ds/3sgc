@@ -40,11 +40,10 @@ int md_to_html(const char *md, const char *html) {
             ln[--len] = '\0';
         }
 
+        // header check, convert number of '#' to <h*>
         while (ln[lvl] == '#') {
             lvl++;
         }
-
-        // header check
         if (lvl > 0 && lvl < 7 && ln[lvl] == ' ') {
             close_p(html_file, &in_p);
             fprintf(html_file, "<h%d>%s</h%d>\n", lvl, ln + lvl + 1, lvl);
@@ -53,7 +52,7 @@ int md_to_html(const char *md, const char *html) {
         } else if (len == 0) {
             close_p(html_file, &in_p);
 
-        // if not in paragraph, open <p>, print
+        // checking whether in <p> or not 
         } else {
             if (!in_p) {
                 fprintf(html_file, "<p>");
