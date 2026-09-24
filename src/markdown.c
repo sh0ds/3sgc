@@ -10,20 +10,32 @@ static void close_p(FILE* out, int *in_p) {
     }
 }
 
-// TODO: add HTML escaping function
+static void write_text(FILE *out, const char *s) {
+    size_t len = strlen(s);
+    
+    for (size_t i = 0; i < len; i++) {
+        switch (s[i]) {
+            case '<':
+                fputs("&lt;", out);
+                break;
+            case '>':
+                fputs("&gt;", out);
+                break;
+            case '&':
+                fputs("&amp;", out);
+                break;
+            case '"':
+                fputs("&quot;", out);
+                break;
+            default:
+                fputc(s[i], out);
+                break;
+        }
+    }
+}
 
 int md_to_html(FILE *md_file, FILE *html_file) {
-    // check files
-    if (md_file == NULL) {
-        perror("Error opening markdown file");
-        return -1;
-    }
-    if (html_file == NULL) {
-        perror("Error opening HTML file");
-        fclose(md_file);
-        return -1;
-    }
-    
+
     //variables
     char *ln = NULL;
     size_t cap = 0;
@@ -47,7 +59,9 @@ int md_to_html(FILE *md_file, FILE *html_file) {
         }
         if (lvl > 0 && lvl < 7 && ln[lvl] == ' ') {
             close_p(html_file, &in_p);
-            fprintf(html_file, "<h%d>%s</h%d>\n", lvl, ln + lvl + 1, lvl);
+            fprintf(html_file, "<h%d>", lvl);
+            write_text(html_file, ln + lvl + 1);
+            fprintf(html_file, "</h%d>\n", lvl);
         
         // empty line check    
         } else if (len == 0) {
@@ -59,17 +73,14 @@ int md_to_html(FILE *md_file, FILE *html_file) {
                 fprintf(html_file, "<p>");
                 in_p = 1;
             }
-            fprintf(html_file, "%s\n", ln);
+            write_text(html_file, ln);
+            fputc('\n', html_file);
         }
     }
     close_p(html_file, &in_p);
 
-    int result = ferror(md_file) ? -1 : 0;
+    int result = (ferror(md_file) || ferror(html_file)) ? -1 : 0;
     free(ln);
-    fclose(md_file);
-    if(fclose(html_file) != 0) {
-        perror("Error closing HTML file");
-        return -1;
-    }
+
     return result;
 }
