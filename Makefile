@@ -1,5 +1,5 @@
 CC      = cc
-CFLAGS  = -std=c11 -Wall -Wextra -g -fsanitize=address,undefined -D_POSIX_C_SOURCE=200809L
+CFLAGS  = -std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -g -fsanitize=address,undefined
 SRC     = $(wildcard src/*.c)
 OBJ     = $(SRC:src/%.c=build/%.o)
 
