@@ -12,7 +12,7 @@ static void close_p(FILE* out, int *in_p) {
 
 static void write_text(FILE *out, const char *s) {
     size_t len = strlen(s);
-    
+
     for (size_t i = 0; i < len; i++) {
         switch (s[i]) {
             case '<':
@@ -45,7 +45,7 @@ int md_to_html(FILE *md_file, FILE *html_file) {
     // getline loop
     while ((len = getline(&ln, &cap, md_file)) != -1) {
         int lvl = 0;
-        
+
         if (len > 0 && ln[len - 1] == '\n') {
             ln[--len] = '\0';
         }
@@ -62,12 +62,12 @@ int md_to_html(FILE *md_file, FILE *html_file) {
             fprintf(html_file, "<h%d>", lvl);
             write_text(html_file, ln + lvl + 1);
             fprintf(html_file, "</h%d>\n", lvl);
-        
-        // empty line check    
+
+        // empty line check
         } else if (len == 0) {
             close_p(html_file, &in_p);
 
-        // checking whether in <p> or not 
+        // checking whether in code or not
         } else if (strncmp(ln, "```", 3) == 0) {
             if (!in_code) {
                 fprintf(html_file, "<code>");
@@ -77,6 +77,8 @@ int md_to_html(FILE *md_file, FILE *html_file) {
                 in_code = 0;
             }
             write_text(html_file, ln + 3);
+
+        // checking whether in code or not
         } else {
             if (!in_p) {
                 fprintf(html_file, "<p>");
