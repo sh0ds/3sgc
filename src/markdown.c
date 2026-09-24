@@ -39,6 +39,9 @@ int md_to_html(const char *md, const char *html) {
         if (len > 0 && ln[len - 1] == '\n') {
             ln[--len] = '\0';
         }
+        if (len > 0 && ln[len - 1] == '\r') {
+            ln[--len] = '\0';
+        }
 
         // header check, convert number of '#' to <h*>
         while (ln[lvl] == '#') {
