@@ -2,6 +2,21 @@
 #include "fs.h"
 #include "markdown.h"
 
+/*
+ * TODO:
+ * loop over content folder, converting every entry to html,
+ * implement shell args to 1: build content folder; 2: copy static to public,
+ * add more markdown syntax:
+ *      - horizontal rules
+ *      - bold and italic
+ *      - lists (ordered, unordered)
+ *      - blockquotes
+ *      - images
+ *      - links, footnotes
+ *      - highlight
+ *      - subscript, superscript
+ *      - syntax highlighting
+ */
 
 int main (int argc, char *argv[]) {
     /*if (argc > 1) {

@@ -12,13 +12,33 @@ paragraph 2
 Hello, <World!>
 
 ``` 
-<!DOCTYPE html>
-<html>
-<body>
+#include <stdlib.h>
+#include "fs.h"
+#include "markdown.h"
 
-<h1>My First Heading</h1>
-<p>My first paragraph 1 & paragraph 2.</p>
 
-</body>
-</html> 
+int main (int argc, char *argv[]) {
+    /*if (argc > 1) {
+        printf("Building %s\n", argv[1]);
+    } else {
+        printf("usage: 3sgc path_to_site_folder\n");
+        exit(1);
+        }*/
+    char *md_path = "sites/site1/content/index.md";
+    char *html_path = "sites/site1/static/index.html";
+    const char *temp_path = "sites/site1/templates/basic.html";
+
+    render_page(temp_path, md_path, html_path);
+
+    // copy_dir("tests/site1/static", "tests/site1/public");
+
+    /*
+    char str[50];
+    join_path(str, 50, "test", "test.css");
+	printf("%s\n", str);
+	*/
+
+    return 0;
+}
+
 ```
