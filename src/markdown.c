@@ -76,7 +76,7 @@ int md_to_html(FILE *md_file, FILE *html_file) {
                 fprintf(html_file, "</code>");
                 in_code = 0;
             }
-            write_text(html_file, ln);
+            write_text(html_file, ln + 3);
         } else {
             if (!in_p) {
                 fprintf(html_file, "<p>");
