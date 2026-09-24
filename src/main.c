@@ -1,4 +1,5 @@
 #include "fs.h"
+#include "markdown.h"
 
 
 int main (int argc, char *argv[]) {
@@ -10,7 +11,9 @@ int main (int argc, char *argv[]) {
         }*/
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
-    copy_dir("./tests", "./tmp");
+    // copy_dir("./tests", "./tmp");
+
+    md_to_html("tests/site1/content/index.md", "tests/site1/templates/base.html");
 
     /*
     char str[50];
