@@ -12,8 +12,9 @@ int main (int argc, char *argv[]) {
 
     // copy_file("./tests/site1/static/style.css", "./tmp/style.css");
     // copy_dir("./tests", "./tmp");
-
-    md_to_html("tests/site1/content/index.md", "tests/site1/templates/base.html");
+    // FILE *md = fopen("tests/site1/content/index.md", "r");
+    // FILE *html = fopen("tests/site1/templates/base.html", "w");
+    md_to_html(stdin, stdout);
 
     /*
     char str[50];

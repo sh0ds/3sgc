@@ -12,14 +12,12 @@ static void close_p(FILE* out, int *in_p) {
 
 // TODO: add HTML escaping function
 
-int md_to_html(const char *md, const char *html) {
-    // open files
-    FILE *md_file = fopen(md, "r");
+int md_to_html(FILE *md_file, FILE *html_file) {
+    // check files
     if (md_file == NULL) {
         perror("Error opening markdown file");
         return -1;
     }
-    FILE *html_file = fopen(html, "w");
     if (html_file == NULL) {
         perror("Error opening HTML file");
         fclose(md_file);
