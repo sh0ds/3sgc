@@ -50,7 +50,7 @@ static void write_text(FILE *out, const char *s) {
 
 
 static int name_is(const char *name, int len, const char *word) {
-  return (strlen(word) == (size_t)len && strncmp(name, word, len));
+  return (strlen(word) == (size_t)len && strncmp(name, word, len) == 0);
 }
 
 static const char *get_value(const FrontMatter *fm, const char *key, int len) {
@@ -89,7 +89,7 @@ static int fill_temp(FILE *out, const char *temp, FILE *md, const FrontMatter *f
 
     len = key_end - open;
 
-    if (name_is(++open, len, "content") == 1) {
+    if (name_is(open, len, "content") == 1) {
       if(md_convert(md, out) == -1) {return -1;}
     } else {
       if((value = get_value(fm, open, len)) == NULL) {
