@@ -23,6 +23,34 @@ static void close_p(FILE *out, int *in_p) {
   }
 }
 
+static int fill_temp(FILE *out, const char *temp, FILE *md, const FrontMatter *fm) {
+  int len;
+  const char *cursor = temp;
+  const char *open = NULL, *close = NULL;
+
+  while(1) {
+    if ((open = strstr(cursor, "{{")) == NULL) {
+      fputs(cursor, out);
+      break;
+    }
+
+    fwrite(cursor, 1, open - cursor, out);
+
+    if ((close = strstr(open + 2, "}}")) == NULL) {
+      fprintf(stderr, "No closing '}}' found.\n");
+      return -1;
+    }
+
+    len = close - (open + 2);
+
+    printf("%.*s\n", len, open + 2);
+
+    cursor = close + 2;
+  }
+
+  return 0;
+}
+
 static void set_kv_pair(FrontMatter *fm, const char *key, const char *value) {
   if (strcmp(key, "title") == 0) {
     snprintf(fm->title, sizeof(fm->title), "%s", value);
@@ -215,7 +243,7 @@ int md_to_html(const char *md_path, const char *html_path) {
 int render_page(const char *temp_path, const char *md_path,
                 const char *html_path) {
   int result = -1;
-  char *temp = NULL, *pos = NULL;
+  char *temp = NULL;
   FILE *md = NULL;
   FILE *html = NULL;
   FrontMatter fm;
@@ -223,12 +251,6 @@ int render_page(const char *temp_path, const char *md_path,
   // read template into a string
   if ((temp = read_file(temp_path)) == NULL)
     goto cleanup;
-
-  // find the position of the placeholder
-  if ((pos = strstr(temp, "{{ content }}")) == NULL) {
-    fprintf(stderr, "Cannot find content placeholder in %s\n", temp_path);
-    goto cleanup;
-  }
 
   // open files
   md = fopen(md_path, "rb");
@@ -238,11 +260,11 @@ int render_page(const char *temp_path, const char *md_path,
   }
 
   if ((parse_fm(md, &fm)) != 0) {
-    fprintf(stderr, "Error parsing FM.\n");
+    fprintf(stderr, "Error parsing FM: %s.\n", md_path);
     goto cleanup;
   }
 
-  printf("%s", fm.title);
+  printf("%s\n", fm.title);
 
   html = fopen(html_path, "wb");
   if (html == NULL) {
@@ -250,15 +272,7 @@ int render_page(const char *temp_path, const char *md_path,
     goto cleanup;
   }
 
-  // write upper half of template
-  fwrite(temp, 1, pos - temp, html);
-
-  // call md_convert for directly converting the content
-  if (md_convert(md, html) == -1)
-    goto cleanup;
-
-  // write lower half of template
-  fputs(pos + strlen("{{ content }}"), html);
+  fill_temp(html, temp, md, &fm);
 
   result = 0;
 

@@ -56,6 +56,7 @@ int main (int argc, char *argv[]) {
     */
 
     build_content("/home/sh0ds/Projects/3sgc/sites/site1/content", "/home/sh0ds/Projects/3sgc/sites/site1/public", "/home/sh0ds/Projects/3sgc/sites/site1/templates/basic.html");
+    copy_dir("/home/sh0ds/Projects/3sgc/sites/site1/static", "/home/sh0ds/Projects/3sgc/sites/site1/public");
 
     return 0;
 }
