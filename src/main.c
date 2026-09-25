@@ -50,10 +50,12 @@ int main (int argc, char *argv[]) {
 
 
     } */
-
+    /*
     FILE *md = fopen("./sites/site1/content/test2.md", "rb");
     FrontMatter fm = {0};
-    parse_fm(md, &fm);
+    */
+
+    build_content("/home/sh0ds/Projects/3sgc/sites/site1/content", "/home/sh0ds/Projects/3sgc/sites/site1/public", "/home/sh0ds/Projects/3sgc/sites/site1/templates/basic.html");
 
     return 0;
 }

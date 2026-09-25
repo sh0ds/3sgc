@@ -1,17 +1,19 @@
 #include "markdown.h"
 #include "fs.h"
+#include <dirent.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
 #include <sys/stat.h>
-#include <errno.h>
-#include <limits.h>
 
 static void strip_nl(char *s) {
-    size_t n = strlen(s);
-    if (n > 0 && s[n - 1] == '\n') s[--n] = '\0';
-    if (n > 0 && s[n - 1] == '\r') s[--n] = '\0';
+  size_t n = strlen(s);
+  if (n > 0 && s[n - 1] == '\n')
+    s[--n] = '\0';
+  if (n > 0 && s[n - 1] == '\r')
+    s[--n] = '\0';
 }
 
 static void close_p(FILE *out, int *in_p) {
@@ -22,17 +24,17 @@ static void close_p(FILE *out, int *in_p) {
 }
 
 static void set_kv_pair(FrontMatter *fm, const char *key, const char *value) {
-    if (strcmp(key, "title") == 0) {
-        snprintf(fm->title, sizeof(fm->title), "%s", value);
-    } else if (strcmp(key, "author") == 0) {
-        snprintf(fm->author, sizeof(fm->author), "%s", value);
-    } else if (strcmp(key, "date") == 0) {
-        snprintf(fm->date, sizeof(fm->date), "%s", value);
-    } else if (strcmp(key, "summary") == 0) {
-        snprintf(fm->summary, sizeof(fm->summary), "%s", value);
-    } else {
-        fprintf(stderr, "Unknown FM key: %s\n", key);
-    }
+  if (strcmp(key, "title") == 0) {
+    snprintf(fm->title, sizeof(fm->title), "%s", value);
+  } else if (strcmp(key, "author") == 0) {
+    snprintf(fm->author, sizeof(fm->author), "%s", value);
+  } else if (strcmp(key, "date") == 0) {
+    snprintf(fm->date, sizeof(fm->date), "%s", value);
+  } else if (strcmp(key, "summary") == 0) {
+    snprintf(fm->summary, sizeof(fm->summary), "%s", value);
+  } else {
+    fprintf(stderr, "Unknown FM key: %s\n", key);
+  }
 }
 
 // HTML escaping
@@ -61,45 +63,47 @@ static void write_text(FILE *out, const char *s) {
 }
 
 int parse_fm(FILE *md, FrontMatter *fm) {
-    char* ln = NULL;
-    size_t cap = 0;
-    int rs = -1;
+  char *ln = NULL;
+  size_t cap = 0;
+  int rs = -1;
 
-    memset(fm, 0, sizeof(*fm));
+  memset(fm, 0, sizeof(*fm));
 
-    if (getline(&ln, &cap, md) == -1) {
-        rs = ferror(md) ? -1 : 0;
-        goto cleanup;
-    }
+  if (getline(&ln, &cap, md) == -1) {
+    rs = ferror(md) ? -1 : 0;
+    goto cleanup;
+  }
+  strip_nl(ln);
+  if (strcmp(ln, "---") != 0) {
+    fseek(md, 0, SEEK_SET);
+    rs = 0;
+    goto cleanup;
+  }
+
+  while (getline(&ln, &cap, md) != -1) {
     strip_nl(ln);
-    if (strcmp(ln, "---") != 0) {
-        fseek(md, 0, SEEK_SET);
-        rs = 0;
-        goto cleanup;
+    if (strcmp(ln, "---") == 0) {
+      rs = 0;
+      goto cleanup;
     }
 
-    while(getline(&ln, &cap, md) != -1) {
-        strip_nl(ln);
-        if (strcmp(ln, "---") == 0) {
-            rs = 0;
-            goto cleanup;
-        }
+    char *colon = strchr(ln, ':');
+    if (colon == NULL)
+      continue;
 
-        char *colon = strchr(ln, ':');
-        if (colon == NULL) continue;
+    *colon = '\0';
+    char *value = colon + 1;
+    while (*value == ' ')
+      value++;
 
-        *colon = '\0';
-        char *value = colon + 1;
-        while (*value == ' ') value++;
+    set_kv_pair(fm, ln, value);
+  }
 
-        set_kv_pair(fm, ln, value);
-    }
-
-    fprintf(stderr, "FM is missing closing '---'\n");
+  fprintf(stderr, "FM is missing closing '---'\n");
 
 cleanup:
-    free(ln);
-    return rs;
+  free(ln);
+  return rs;
 }
 
 int md_convert(FILE *md_file, FILE *html_file) {
@@ -158,9 +162,9 @@ int md_convert(FILE *md_file, FILE *html_file) {
       write_text(html_file, ln + lvl + 1);
       fprintf(html_file, "</h%d>\n", lvl);
 
-   /*
-    *       -- EMPTY LINES & PARAPGRAPHS --
-    */
+      /*
+       *       -- EMPTY LINES & PARAPGRAPHS --
+       */
 
       // empty line check
     } else if (len == 0) {
@@ -214,6 +218,7 @@ int render_page(const char *temp_path, const char *md_path,
   char *temp = NULL, *pos = NULL;
   FILE *md = NULL;
   FILE *html = NULL;
+  FrontMatter fm;
 
   // read template into a string
   if ((temp = read_file(temp_path)) == NULL)
@@ -221,7 +226,7 @@ int render_page(const char *temp_path, const char *md_path,
 
   // find the position of the placeholder
   if ((pos = strstr(temp, "{{ content }}")) == NULL) {
-    fprintf(stderr, "Cannot find placeholder in %s\n", temp_path);
+    fprintf(stderr, "Cannot find content placeholder in %s\n", temp_path);
     goto cleanup;
   }
 
@@ -231,6 +236,14 @@ int render_page(const char *temp_path, const char *md_path,
     perror("Error opening .md file");
     goto cleanup;
   }
+
+  if ((parse_fm(md, &fm)) != 0) {
+    fprintf(stderr, "Error parsing FM.\n");
+    goto cleanup;
+  }
+
+  printf("%s", fm.title);
+
   html = fopen(html_path, "wb");
   if (html == NULL) {
     perror("Error opening .html file");
@@ -270,9 +283,9 @@ int build_content(const char *src, const char *dst, const char *temp) {
 
   // create dst, it's fine if it already exists
   if (mkdir(dst, 0777) != 0 && errno != EEXIST) {
-		perror(dst);
-		return -1;
-	}
+    perror(dst);
+    return -1;
+  }
 
   sd = opendir(src);
   if (sd == NULL) {
@@ -282,42 +295,43 @@ int build_content(const char *src, const char *dst, const char *temp) {
 
   while ((entry = readdir(sd)) != NULL) {
 
-		// skip current and parent directory
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-			continue;
-		}
+    // skip current and parent directory
+    if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      continue;
+    }
 
-		// create path of src and dst via helper function
-		char src_path[PATH_MAX];
-		char dst_path[PATH_MAX];
-		if (join_path(src_path, sizeof(src_path), src, entry->d_name) == -1 ||
-		    join_path(dst_path, sizeof(dst_path), dst, entry->d_name) == -1) {
-			fprintf(stderr, "Joining path failed\n");
-			closedir(sd);
-			return -1;
-		}
+    // create path of src and dst via helper function
+    char src_path[PATH_MAX];
+    char dst_path[PATH_MAX];
+    if (join_path(src_path, sizeof(src_path), src, entry->d_name) == -1 ||
+        join_path(dst_path, sizeof(dst_path), dst, entry->d_name) == -1) {
+      fprintf(stderr, "Joining path failed\n");
+      closedir(sd);
+      return -1;
+    }
 
-		// get type of src
-		if (lstat(src_path, &st) != 0) {
-			perror(src_path);
-			closedir(sd);
-			return -1;
-		}
+    // get type of src
+    if (lstat(src_path, &st) != 0) {
+      perror(src_path);
+      closedir(sd);
+      return -1;
+    }
 
     const char *dot = strrchr(entry->d_name, '.'); // pointer to extension
 
     // recursive call if folder
-		if (S_ISDIR(st.st_mode)) {
-			if (build_content(src_path, dst_path, temp) != 0) {
-				closedir(sd);
-				return -1;
-			}
-		} else if (S_ISREG(st.st_mode)) {
-			if (dot != NULL && strcmp(dot, ".md") == 0) {
+    if (S_ISDIR(st.st_mode)) {
+      if (build_content(src_path, dst_path, temp) != 0) {
+        closedir(sd);
+        return -1;
+      }
+    } else if (S_ISREG(st.st_mode)) {
+      if (dot != NULL && strcmp(dot, ".md") == 0) {
         char html_name[PATH_MAX];
         char html_path[PATH_MAX];
 
-        if (replace_ext(html_name, sizeof(html_name), entry->d_name, ".html") == -1) {
+        if (replace_ext(html_name, sizeof(html_name), entry->d_name, ".html") ==
+            -1) {
           closedir(sd);
           return -1;
         }
@@ -332,14 +346,13 @@ int build_content(const char *src, const char *dst, const char *temp) {
       } else {
         fprintf(stderr, "%s is not a markdown file.\n", entry->d_name);
       }
-		} else {
-			// skip symlinks, FIFOs, devices, sockets
-			fprintf(stderr, "Skipping %s (not a regular file)\n", src_path);
-		}
-	}
+    } else {
+      // skip symlinks, FIFOs, devices, sockets
+      fprintf(stderr, "Skipping %s (not a regular file)\n", src_path);
+    }
+  }
 
   closedir(sd);
 
   return 0;
-
 }
