@@ -1,9 +1,7 @@
 #include <linux/limits.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include "fs.h"
-#include "markdown.h"
-#include <string.h>
+#include "build.h"
+
 
 /*
  * TODO:
