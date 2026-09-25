@@ -4,7 +4,7 @@
 
 /*
  * TODO:
- *  1. loop over content folder, converting every .md entry to html
+ *  1. loop over content folder, converting every .md entry to html :: done
  *  2. implement shell args:
  *      - build: build content folder and copy static to public
  *      - content: build content folder only
@@ -37,11 +37,11 @@ int main (int argc, char *argv[]) {
         exit(1);
         }*/
 
-    char *md_path = "sites/site1/content/test.md";
-    char *html_path = "sites/site1/static/index.html";
-    const char *temp_path = "sites/site1/templates/basic.html";
+    char *src = "sites/site1/content";
+    char *dst = "sites/site1/static";
+    const char *temp = "sites/site1/templates/basic.html";
 
-    render_page(temp_path, md_path, html_path);
+    build_content(src, dst, temp);
 
     // copy_dir("sites/site1/static", "sites/site1/public");
 

@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <limits.h>
 
 static void close_p(FILE *out, int *in_p) {
   if (*in_p) {
@@ -195,4 +199,85 @@ cleanup:
   free(temp);
 
   return result;
+}
+
+int build_content(const char *src, const char *dst, const char *temp) {
+  DIR *sd;
+  struct dirent *entry;
+  struct stat st;
+
+  // create dst, it's fine if it already exists
+  if (mkdir(dst, 0777) != 0 && errno != EEXIST) {
+		perror(dst);
+		return -1;
+	}
+
+  sd = opendir(src);
+  if (sd == NULL) {
+    perror(src);
+    return -1;
+  }
+
+  while ((entry = readdir(sd)) != NULL) {
+
+		// skip current and parent directory
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+			continue;
+		}
+
+		// create path of src and dst via helper function
+		char src_path[PATH_MAX];
+		char dst_path[PATH_MAX];
+		if (join_path(src_path, sizeof(src_path), src, entry->d_name) == -1 ||
+		    join_path(dst_path, sizeof(dst_path), dst, entry->d_name) == -1) {
+			fprintf(stderr, "Joining path failed\n");
+			closedir(sd);
+			return -1;
+		}
+
+		// get type of src
+		if (lstat(src_path, &st) != 0) {
+			perror(src_path);
+			closedir(sd);
+			return -1;
+		}
+
+    const char *dot = strrchr(entry->d_name, '.'); // pointer to extension
+
+    // recursive call if folder
+		if (S_ISDIR(st.st_mode)) {
+			if (build_content(src_path, dst_path, temp) != 0) {
+				closedir(sd);
+				return -1;
+			}
+		} else if (S_ISREG(st.st_mode)) {
+			if (dot != NULL && strcmp(dot, ".md") == 0) {
+        char html_name[PATH_MAX];
+        char html_path[PATH_MAX];
+
+        if (replace_ext(html_name, sizeof(html_name), entry->d_name, ".html") == -1) {
+          closedir(sd);
+          return -1;
+        }
+        if (join_path(html_path, sizeof(html_path), dst, html_name) == -1) {
+          closedir(sd);
+          return -1;
+        }
+        if (render_page(temp, src_path, html_path) == -1) {
+          closedir(sd);
+          return -1;
+        }
+      } else {
+        fprintf(stderr, "%s is not a markdown file.\n", entry->d_name);
+      }
+		} else {
+			// skip symlinks, FIFOs, devices, sockets
+			fprintf(stderr, "Skipping %s (not a regular file)\n", src_path);
+		}
+	}
+
+  closedir(sd);
+
+  return 0;
+
 }

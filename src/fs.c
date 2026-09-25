@@ -65,6 +65,23 @@ int join_path(char *out, size_t out_size, const char *dir, const char *name) {
 	return 0;
 }
 
+int replace_ext(char *out, size_t out_size, const char *name, const char *new_ext) {
+	const char *extd;
+	int len;
+
+	extd = strrchr(name, '.');
+	if(extd == NULL) return -1;
+
+	len = extd - name;
+
+	int res = snprintf(out, out_size, "%.*s%s", len, name, new_ext);
+	if (res < 0 || (size_t)res >= out_size) {
+		return -1;
+	}
+
+	return 0;
+}
+
 // recursively copies directory src to dst
 int copy_dir(const char *src, const char *dst) {
 	DIR *sd;
