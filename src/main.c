@@ -29,21 +29,28 @@
 
 
 int main (int argc, char *argv[]) {
-    /*if (argc > 2) {
-        printf("Building %s\n", argv[1]);
+    if (argc == 2) {
+        if (strcmp(argv[1], "build") == 0) {
+
+        } else if (strcmp(argv[1], "content") == 0) {
+
+        } else if (strcmp(argv[1], "static") == 0) {
+
+        } else {
+            fprintf(stderr, "Unrecognised argument, try again. (type '3sgc' for usage)\n");
+            return 1;
+        }
+    } else if (argc > 2) {
+        fprintf(stderr, "Too many arguments, try again. (type '3sgc' for usage)\n");
+        return 1;
     } else {
-        printf("usage: 3sgc path_to_site_folder -flag\n");
-        printf("flags: -s: convert to static, -p: push to public\n");
-        exit(1);
-        }*/
-
-    char *src = "sites/site1/content";
-    char *dst = "sites/site1/static";
-    const char *temp = "sites/site1/templates/basic.html";
-
-    build_content(src, dst, temp);
-
-    // copy_dir("sites/site1/static", "sites/site1/public");
+        printf("usage: 3sgc <command>\n");
+        printf("commands:\n");
+        printf("build: build content folder and copy static to public\n");
+        printf("content: build content folder only\n");
+        printf("static: copy static to public only\n");
+        return 1;
+    }
 
     return 0;
 }
