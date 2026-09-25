@@ -1,6 +1,9 @@
+#include <linux/limits.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include "fs.h"
 #include "markdown.h"
+#include <string.h>
 
 /*
  * TODO:
@@ -29,13 +32,41 @@
 
 
 int main (int argc, char *argv[]) {
+
     if (argc == 3) {
-        if (strcmp(argv[2], "build") == 0) {
+        const char *path = argv[1];
+        const char *arg = argv[2];
+        char c_path[PATH_MAX], s_path[PATH_MAX], t_path[PATH_MAX], p_path[PATH_MAX];
+        join_path(c_path, sizeof(c_path), path, "content");
+        join_path(s_path, sizeof(s_path), path, "static");
+        join_path(t_path, sizeof(t_path), path, "templates/template.html");
+        join_path(p_path, sizeof(p_path), path, "public");
 
-        } else if (strcmp(argv[2], "content") == 0) {
-
-        } else if (strcmp(argv[2], "static") == 0) {
-
+        if (strcmp(arg, "build") == 0) {
+            if (build_content(c_path, s_path, t_path) == -1) {
+                fprintf(stderr, "Build failed.\n");
+                return 1;
+            }
+            if (copy_dir(s_path, p_path) == -1) {
+                fprintf(stderr, "Copying failed.\n");
+                return 1;
+            }
+            printf("Build and copy complete.\n");
+            return 0;
+        } else if (strcmp(arg, "content") == 0) {
+            if (build_content(c_path, s_path, t_path) == -1) {
+                fprintf(stderr, "Build failed.\n");
+                return 1;
+            }
+            printf("Build complete.\n");
+            return 0;
+        } else if (strcmp(arg, "static") == 0) {
+            if (copy_dir(s_path, p_path) == -1) {
+                fprintf(stderr, "Copying failed.\n");
+                return 1;
+            }
+            printf("Copy complete.");
+            return 0;
         } else {
             fprintf(stderr, "Unrecognised argument, try again. (type '3sgc' for usage)\n");
             return 1;
