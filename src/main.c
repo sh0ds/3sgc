@@ -29,26 +29,26 @@
 
 
 int main (int argc, char *argv[]) {
-    if (argc == 2) {
-        if (strcmp(argv[1], "build") == 0) {
+    if (argc == 3) {
+        if (strcmp(argv[2], "build") == 0) {
 
-        } else if (strcmp(argv[1], "content") == 0) {
+        } else if (strcmp(argv[2], "content") == 0) {
 
-        } else if (strcmp(argv[1], "static") == 0) {
+        } else if (strcmp(argv[2], "static") == 0) {
 
         } else {
             fprintf(stderr, "Unrecognised argument, try again. (type '3sgc' for usage)\n");
             return 1;
         }
-    } else if (argc > 2) {
+    } else if (argc > 3) {
         fprintf(stderr, "Too many arguments, try again. (type '3sgc' for usage)\n");
         return 1;
     } else {
-        printf("usage: 3sgc <command>\n");
-        printf("commands:\n");
-        printf("build: build content folder and copy static to public\n");
-        printf("content: build content folder only\n");
-        printf("static: copy static to public only\n");
+        printf("usage:\n            3sgc <site_path> <command>");
+        printf("\ncommands:\n");
+        printf("'build'     build content folder and copy static to public\n");
+        printf("'content'   build content folder only\n");
+        printf("'static'    copy static to public only\n");
         return 1;
     }
 
