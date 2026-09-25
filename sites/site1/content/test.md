@@ -1,44 +1,54 @@
-# header1
-## header2
-### header3
-#### header 4
-##### header 5
-###### header 6
-
+# header 1
 paragraph 1
-"sees" & "soos" :) 
+test
+test
+test
 
+## header 2
 paragraph 2
-Hello, <World!>
+test
+test
+test
 
-``` 
+```
 #include <stdlib.h>
 #include "fs.h"
 #include "markdown.h"
 
+/*
+ * TODO:
+ * loop over content folder, converting every entry to html,
+ * implement shell args to 1: build content folder; 2: copy static to public,
+ * add more markdown syntax:
+ *      - links
+ *      - images
+ *      - horizontal rules
+ *      - bold and italic
+ *      - lists (ordered, unordered)
+ *      - syntax highlighting
+ *      - blockquotes
+ *      - footnotes
+ *      - highlight
+ *      - subscript, superscript
+ */
 
 int main (int argc, char *argv[]) {
-    /*if (argc > 1) {
+    /*if (argc > 2) {
         printf("Building %s\n", argv[1]);
     } else {
-        printf("usage: 3sgc path_to_site_folder\n");
+        printf("usage: 3sgc path_to_site_folder -flag\n");
+        printf("flags: -s: convert to static, -p: push to public\n");
         exit(1);
         }*/
-    char *md_path = "sites/site1/content/index.md";
+
+    char *md_path = "sites/site1/content/test.md";
     char *html_path = "sites/site1/static/index.html";
     const char *temp_path = "sites/site1/templates/basic.html";
 
     render_page(temp_path, md_path, html_path);
 
-    // copy_dir("tests/site1/static", "tests/site1/public");
-
-    /*
-    char str[50];
-    join_path(str, 50, "test", "test.css");
-	printf("%s\n", str);
-	*/
+    // copy_dir("sites/site1/static", "sites/site1/public");
 
     return 0;
 }
-
 ```
