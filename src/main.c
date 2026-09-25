@@ -13,21 +13,22 @@
  *      - content: build content folder only
  *      - static: copy static to public only
  *  3. front matter:
- *      - parse key: value block between --- lines
- *      - {{ title }} placeholder in template
- *      - date for posts
- *  4. easy block-level syntax:
+ *      - parse key: value block between --- lines :: done ::
+ *      - {{ title }} placeholder in template  :: done ::
+ *      - date for posts :: done ::
+ *  4. order posts and build projects, blog
+ *  5. easy block-level syntax:
  *      - horizontal rules
  *      - syntax highlighting (language class for prism)
  *      - blockquotes
- *  5. lists (ordered, unordered)
- *  6. inline syntax:
+ *  6. lists (ordered, unordered)
+ *  7. inline syntax:
  *      - bold and italic
  *      - links
  *      - images
  *      - highlight
  *      - subscript, superscript
- *  7. footnotes
+ *  8. footnotes
  */
 
 
