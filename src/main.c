@@ -4,20 +4,29 @@
 
 /*
  * TODO:
- * loop over content folder, converting every entry to html,
- * implement shell args to 1: build content folder; 2: copy static to public,
- * add more markdown syntax:
+ *  1. loop over content folder, converting every .md entry to html
+ *  2. implement shell args:
+ *      - build: build content folder and copy static to public
+ *      - content: build content folder only
+ *      - static: copy static to public only
+ *  3. front matter:
+ *      - parse key: value block between --- lines
+ *      - {{ title }} placeholder in template
+ *      - date for posts
+ *  4. easy block-level syntax:
+ *      - horizontal rules
+ *      - syntax highlighting (language class for prism)
+ *      - blockquotes
+ *  5. lists (ordered, unordered)
+ *  6. inline syntax:
+ *      - bold and italic
  *      - links
  *      - images
- *      - horizontal rules
- *      - bold and italic
- *      - lists (ordered, unordered)
- *      - syntax highlighting
- *      - blockquotes
- *      - footnotes
  *      - highlight
  *      - subscript, superscript
+ *  7. footnotes
  */
+
 
 int main (int argc, char *argv[]) {
     /*if (argc > 2) {
