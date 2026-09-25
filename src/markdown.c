@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,49 +24,6 @@ static void close_p(FILE *out, int *in_p) {
   }
 }
 
-static int fill_temp(FILE *out, const char *temp, FILE *md, const FrontMatter *fm) {
-  int len;
-  const char *cursor = temp;
-  const char *open = NULL, *close = NULL;
-
-  while(1) {
-    if ((open = strstr(cursor, "{{")) == NULL) {
-      fputs(cursor, out);
-      break;
-    }
-
-    fwrite(cursor, 1, open - cursor, out);
-
-    if ((close = strstr(open + 2, "}}")) == NULL) {
-      fprintf(stderr, "No closing '}}' found.\n");
-      return -1;
-    }
-
-    len = close - (open + 2);
-
-    printf("%.*s\n", len, open + 2);
-
-    cursor = close + 2;
-  }
-
-  return 0;
-}
-
-static void set_kv_pair(FrontMatter *fm, const char *key, const char *value) {
-  if (strcmp(key, "title") == 0) {
-    snprintf(fm->title, sizeof(fm->title), "%s", value);
-  } else if (strcmp(key, "author") == 0) {
-    snprintf(fm->author, sizeof(fm->author), "%s", value);
-  } else if (strcmp(key, "date") == 0) {
-    snprintf(fm->date, sizeof(fm->date), "%s", value);
-  } else if (strcmp(key, "summary") == 0) {
-    snprintf(fm->summary, sizeof(fm->summary), "%s", value);
-  } else {
-    fprintf(stderr, "Unknown FM key: %s\n", key);
-  }
-}
-
-// HTML escaping
 static void write_text(FILE *out, const char *s) {
   size_t len = strlen(s);
 
@@ -87,6 +45,77 @@ static void write_text(FILE *out, const char *s) {
       fputc(s[i], out);
       break;
     }
+  }
+}
+
+
+static int name_is(const char *name, int len, const char *word) {
+  return (strlen(word) == (size_t)len && strncmp(name, word, len));
+}
+
+static const char *get_value(const FrontMatter *fm, const char *key, int len) {
+  if (name_is(key, len, "title")) {
+    return fm->title;
+  } else if (name_is(key, len, "author")) {
+    return fm->author;
+  } else if (name_is(key, len, "date")) {
+    return fm->date;
+  } else if (name_is(key, len, "summary")) {
+    return fm->summary;
+  }
+  return NULL;
+}
+
+static int fill_temp(FILE *out, const char *temp, FILE *md, const FrontMatter *fm) {
+  int len;
+  const char *open = NULL, *close = NULL, *key_end = NULL, *cursor = temp, *value;
+
+  while(1) {
+    if ((open = strstr(cursor, "{{")) == NULL) {
+      fputs(cursor, out);
+      break;
+    }
+
+    fwrite(cursor, 1, open - cursor, out);
+    open = open + 2;
+    if ((close = strstr(open, "}}")) == NULL) {
+      fprintf(stderr, "No closing '}}' found.\n");
+      return -1;
+    }
+
+    while (*open == ' ') {open++;}
+    key_end = close;
+    while (*(key_end-1) == ' ') {key_end--;}
+
+    len = key_end - open;
+
+    if (name_is(++open, len, "content") == 1) {
+      if(md_convert(md, out) == -1) {return -1;}
+    } else {
+      if((value = get_value(fm, open, len)) == NULL) {
+        fprintf(stderr, "Unknown name: %.*s\n", len, open);
+        return -1;
+      }
+      write_text(out, value);
+    }
+
+    cursor = close + 2;
+  }
+
+  return 0;
+}
+
+static void set_kv_pair(FrontMatter *fm, const char *key, const char *value) {
+  if (strcmp(key, "title") == 0) {
+    snprintf(fm->title, sizeof(fm->title), "%s", value);
+  } else if (strcmp(key, "author") == 0) {
+    snprintf(fm->author, sizeof(fm->author), "%s", value);
+  } else if (strcmp(key, "date") == 0) {
+    snprintf(fm->date, sizeof(fm->date), "%s", value);
+  } else if (strcmp(key, "summary") == 0) {
+    snprintf(fm->summary, sizeof(fm->summary), "%s", value);
+  } else {
+    fprintf(stderr, "Unknown FM key: %s\n", key);
   }
 }
 
