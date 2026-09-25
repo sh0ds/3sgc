@@ -396,6 +396,5 @@ int build_content(const char *src, const char *dst, const char *temp) {
   }
 
   closedir(sd);
-
   return 0;
 }
