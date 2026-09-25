@@ -1,3 +1,10 @@
+---
+title: test post
+author: sh0ds
+date: 2026-09-25
+summary: A little test post :)
+---
+
 ### header 3
 paragraph 3
 

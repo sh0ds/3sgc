@@ -7,8 +7,8 @@
 
 /*
  * TODO:
- *  1. loop over content folder, converting every .md entry to html :: done
- *  2. implement shell args:
+ *  1. loop over content folder, converting every .md entry to html :: done ::
+ *  2. implement shell args:    :: done ::
  *      - build: build content folder and copy static to public
  *      - content: build content folder only
  *      - static: copy static to public only
@@ -32,56 +32,28 @@
 
 
 int main (int argc, char *argv[]) {
-
+    /*
     if (argc == 3) {
         const char *path = argv[1];
         const char *arg = argv[2];
         char c_path[PATH_MAX], s_path[PATH_MAX], t_path[PATH_MAX], p_path[PATH_MAX];
+
+        // build paths
         join_path(c_path, sizeof(c_path), path, "content");
         join_path(s_path, sizeof(s_path), path, "static");
-        join_path(t_path, sizeof(t_path), path, "templates/template.html");
+        join_path(t_path, sizeof(t_path), path, "templates/basic.html");
         join_path(p_path, sizeof(p_path), path, "public");
 
-        if (strcmp(arg, "build") == 0) {
-            if (build_content(c_path, s_path, t_path) == -1) {
-                fprintf(stderr, "Build failed.\n");
-                return 1;
-            }
-            if (copy_dir(s_path, p_path) == -1) {
-                fprintf(stderr, "Copying failed.\n");
-                return 1;
-            }
-            printf("Build and copy complete.\n");
-            return 0;
-        } else if (strcmp(arg, "content") == 0) {
-            if (build_content(c_path, s_path, t_path) == -1) {
-                fprintf(stderr, "Build failed.\n");
-                return 1;
-            }
-            printf("Build complete.\n");
-            return 0;
-        } else if (strcmp(arg, "static") == 0) {
-            if (copy_dir(s_path, p_path) == -1) {
-                fprintf(stderr, "Copying failed.\n");
-                return 1;
-            }
-            printf("Copy complete.");
-            return 0;
-        } else {
-            fprintf(stderr, "Unrecognised argument, try again. (type '3sgc' for usage)\n");
-            return 1;
-        }
-    } else if (argc > 3) {
-        fprintf(stderr, "Too many arguments, try again. (type '3sgc' for usage)\n");
-        return 1;
-    } else {
-        printf("usage:\n            3sgc <site_path> <command>");
-        printf("\ncommands:\n");
-        printf("'build'     build content folder and copy static to public\n");
-        printf("'content'   build content folder only\n");
-        printf("'static'    copy static to public only\n");
-        return 1;
-    }
+        // copy static to public
+        copy_dir(s_path,p_path);
+
+
+
+    } */
+
+    FILE *md = fopen("./sites/site1/content/test2.md", "rb");
+    FrontMatter fm = {0};
+    parse_fm(md, &fm);
 
     return 0;
 }
