@@ -17,7 +17,7 @@
  *  4. order posts and build projects, blog
  *  5. easy block-level syntax:
  *      - horizontal rules
- *      - syntax highlighting (language class for prism)
+ *      - syntax highlighting
  *      - blockquotes
  *  6. lists (ordered, unordered)
  *  7. inline syntax:
