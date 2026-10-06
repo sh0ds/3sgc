@@ -4,6 +4,5 @@ sites/*/public/*
 tmp/
 sites/*/static/*
 !sites/*/static/.gitkeep
-sites/*/templates/basic.html
-sites/site1/templates/basic.html
 .zed/
+sites/*/content/*
