@@ -46,6 +46,8 @@ void strip_nl(char *s) {
     s[--n] = '\0';
 }
 
+/* TODO: add more md syntax */
+
 int md_convert(FILE *md_file, FILE *html_file) {
   // variables
   char *ln = NULL;
