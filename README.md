@@ -1,17 +1,17 @@
-# 3sgc — sh0ds static site generator (in C)
+# 3sgc, sh0ds static site generator (in C)
 
-A static site generator written in C11. No dependencies beyond libc and POSIX.
+My first little C project. A static site generator in C11 with 0 dependencies, just the standard C library and POSIX. It builds my website, [sh0ds.dev](https://sh0ds.dev).
 
 ## What it does
 
-Collects front matter from markdown files, sorts by date, renders pages through templates, generates blog and project indexes. All in roughly 500 lines.
+Walks everything in the content folder, reads the front matter at the top of each markdown file and sorts the posts by date. Then it renders the pages through the templates and creates the blog and project index pages.
 
 ## Requirements
 
-- C compiler with C11 support
-- POSIX filesystem API (`dirent.h`, `unistd.h`, `sys/stat.h`)
+- a C compiler with C11 support
+- the POSIX filesystem API (`dirent.h`, `unistd.h`, `sys/stat.h`)
 
-No third-party libraries. No framework.
+No third-party libraries, no framework.
 
 ## Building
 
@@ -20,7 +20,7 @@ make          # builds to build/3sgc
 make clean    # removes build/
 ```
 
-Compiler flags include `-Wall -Wextra` plus AddressSanitizer and UndefinedBehaviorSanitizer. If it compiles, it probably won't segfault.
+It builds with `-Wall -Wextra` plus AddressSanitizer and UndefinedBehaviorSanitizer, so if something's off with memory I find out right away.
 
 ## Usage
 
@@ -29,14 +29,14 @@ Compiler flags include `-Wall -Wextra` plus AddressSanitizer and UndefinedBehavi
 ```
 
 Modes:
-- `build` — posts, indexes, and static assets
-- `content` — posts and indexes only
-- `static` — copy static assets only
+- `build`: posts, indexes and static assets
+- `content`: posts and indexes only
+- `static`: only copy the static assets
 
-Example:
+For example:
 
 ```bash
-./build/3sgc /home/sh0ds/Projects/3sgc/sites/site1 build
+./build/3sgc sites/site1 build
 ```
 
 ## Site structure
@@ -46,17 +46,17 @@ sites/site1/
 ├── content/
 │   ├── blog/      ← blog posts go here (gets /blog/index.html)
 │   └── projects/  ← projects go here (gets /projects/index.html)
-├── static/        ← CSS, JS, images (copied verbatim to public/)
+├── static/        ← CSS, JS, images (copied as they are to public/)
 ├── templates/
-│   ├── basic.html     ← single post template
-│   ├── blog.html      ← blog listing (use {{#posts}}...{{/posts}})
-│   └── projects.html  ← project listing (same section syntax)
-└── public/          ← generated output (created by build)
+│   ├── basic.html     ← template for a single post
+│   ├── blog.html      ← blog list (use {{#posts}}...{{/posts}})
+│   └── projects.html  ← project list (same syntax)
+└── public/          ← the output, created by build
 ```
 
 ## Front matter
 
-Every `.md` file in `content/` supports YAML-like front matter:
+Every `.md` file in `content/` can have this at the top:
 
 ```yaml
 ---
@@ -67,9 +67,9 @@ summary: Short description
 ---
 ```
 
-Available placeholders in templates: `{{ title }}`, `{{ author }}`, `{{ date }}`, `{{ summary }}`, `{{ content }}`, `{{ url }}`.
+In the templates you can use `{{ title }}`, `{{ author }}`, `{{ date }}`, `{{ summary }}`, `{{ content }}` and `{{ url }}`.
 
-## Section syntax (for indexes)
+## Lists of posts
 
 ```html
 {{#posts}}
@@ -77,11 +77,11 @@ Available placeholders in templates: `{{ title }}`, `{{ author }}`, `{{ date }}`
 {{/posts}}
 ```
 
-Repeats once per post, filtered by section (blog vs. projects).
+This repeats once for every post in that section (blog or projects).
 
 ## TODO
 
-Markdown syntax still to implement:
+I kept the markdown part simple first so I actually finish the project. This is what's still missing:
 
 - [ ] Lists (unordered `-` / `+`)
 - [ ] Lists (ordered `1.`)
